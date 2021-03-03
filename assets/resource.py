@@ -22,6 +22,7 @@ class HTTPResource:
         ssl_verify = data.get('ssl_verify', True)
         ok_responses = data.get('ok_responses', [200, 201, 202, 204])
         form_data = data.get('form_data')
+        parse_form_data = data.get('parse_form_data', True)
 
         if isinstance(ssl_verify, bool):
             verify = ssl_verify
@@ -29,8 +30,10 @@ class HTTPResource:
             verify = str(tempfile.NamedTemporaryFile(delete=False, prefix='ssl-').write(verify))
 
         request_data = None
-        if form_data:
+        if form_data and parse_form_data:
             request_data = {k: json.dumps(v, ensure_ascii=False) for k, v in form_data.items()}
+        elif form_data and not parse_form_data:
+            request_data = form_data
 
         response = requests.request(method, uri, json=json_data,
                                     data=request_data, headers=headers, verify=verify)

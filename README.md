@@ -38,6 +38,8 @@ Options set in `params` take precedence over options in `source`.
 
 * `form_data`: *Optional* Dictionary with form field/value pairs to send as data. Values are converted to JSON and URL-encoded.
 
+* `parse_form_data`: *Optional* Boolean to specify if form_data should be converted to JSON or not (default `true`). If false, set `"Content-Type":"application/x-www-form-urlencoded"` header.
+
 ## Behavior
 
 Currently the only useful action the resource supports is `out`. The actions `in` and `check` will be added later.
@@ -129,4 +131,32 @@ jobs:
 
           - put: jenkins-trigger-job
 
+```
+
+
+### Call a Rest API with data formated in a standard form
+
+Register apps on a Spring Cloud Data Flow instance via a `POST` formated with `application/x-www-form-urlencoded` encoding type.
+
+More info: https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/htmlsingle/#resources-app-registry-bulk
+
+```yaml
+resources:
+- name: dataflow-rest-api
+  type: http-api
+  source:
+    uri: http://my-dataflow-platform.org
+
+jobs:
+- name: load-apps
+  public: true
+  plan:
+  - put: dataflow-rest-api
+    params:
+      uri: http://my-dataflow-platform.org/apps
+      method: POST
+      debug: true
+      parse_form_data: false
+      form_data:
+        uri: http://artefact.my-repo.com/artifactory/Maven/appsList/0.0.1/appsList-0.0.1.properties
 ```

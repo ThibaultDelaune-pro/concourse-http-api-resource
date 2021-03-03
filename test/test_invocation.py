@@ -131,3 +131,22 @@ def test_data_ensure_ascii(httpbin):
     output = cmd('out', source)
 
     assert output['form'] == {'field': '{"test": "日本語"}'}
+
+
+def test_not_parsed_data(httpbin):
+    """Test form_data in a standard format."""
+
+    source = {
+        'uri': httpbin + '/post',
+        'method': 'POST',
+        'parse_form_data': False,
+        'form_data': {
+            'firstname': 'John',
+            'lastname': 'Doe'
+        }
+    }
+
+    output = cmd('out', source)
+
+    assert output['form'] == {"firstname":"John","lastname":"Doe"}
+    assert output['version'] == {}
